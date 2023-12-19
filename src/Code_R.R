@@ -182,3 +182,5 @@ plot(year_df$year, year_df$avg_rating, main = "Average IMDb Rating by Year",
      xlab = "Year", ylab = "Average IMDb Rating", pch = 16, cex = 1.5)
 barplot(year_order$Freq, names.arg = year_order$Var1, las = 2, main = "Number of Top Movies by Year",
         xlab = "Year", ylab = "# of Movies", cex.names = 0.7)
+
+
