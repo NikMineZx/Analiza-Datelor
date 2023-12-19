@@ -3,7 +3,7 @@ library(caret)
 library(Metrics)
 
 
-movies_df <- read.csv("C://Users//misab//OneDrive//Рабочий стол//Labs//AD//Project In Python//Setul de date Filme.csv")
+movies_df <- read.csv("C://mobile//Bird//Analiza-Datelor//Data//Setul de date Filme.csv")
 head(movies_df)
 
 convert_to_list <- function(string) {
@@ -47,13 +47,15 @@ meta_df <- movies_df[sapply(movies_df, is.numeric) | sapply(movies_df, function(
 
 # Keep only numeric columns
 meta_df <- meta_df[, sapply(meta_df, is.numeric)]
+meta_df <- meta_df[complete.cases(meta_df$metascore), ]
 X <- meta_df[, !colnames(meta_df) %in% "metascore"]
 y <- meta_df$metascore
 set.seed(5)
+groups <- 10
 split <- createDataPartition(y, p = 0.8, list = FALSE)
 # Calculate quantiles with handling missing values
 quantiles <- sapply(1:groups, function(i) {
-  quantile(y, probs = (i - 1) / groups, na.rm = TRUE)
+  quantile(y, probs = (i - 1) / groups, na.rm = TRUE, na.rm.nan = TRUE)
 })
 
 train_X <- X[split, ]
@@ -73,7 +75,7 @@ summary(meta_knn)
 train_X_sel_knn <- train_X[, names(coef(meta_knn))[-1]]
 test_X_sel_knn <- test_X[, names(coef(meta_knn))[-1]]
 
-k_grid <- data.frame(n_neighbors = seq(1, floor(sqrt(nrow(train_X))), by = 1))
+k_grid <- expand.grid(k = seq(1, floor(sqrt(nrow(train_X))), by = 1))
 meta_knn_gscv <- train(x = train_X_sel_knn, y = train_y, method = "knn", tuneGrid = k_grid)
 best_params <- meta_knn_gscv$results[which.min(meta_knn_gscv$results$RMSE), ]
 meta_knn <- knnreg(train_X_sel_knn, train_y, k = best_params$n_neighbors)
